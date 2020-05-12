@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string.h>
+#include <string>
 
 class Parser {
-    void parseDimacsFile(const string filePath);
-}
+    void parseDimacsFile(const std::string &filePath);
+};

@@ -6,7 +6,7 @@
 // 1 -3 0
 // 2 3 -1 0 
 
-void Parser::parseDimacsFile(const string filePath) {
+void Parser::parseDimacsFile(const std::string &filePath) {
     return;
 }    
 

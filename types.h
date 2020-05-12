@@ -10,4 +10,4 @@ class Literal {
         int getId() {
             return this->id;
         }
-}
+};
