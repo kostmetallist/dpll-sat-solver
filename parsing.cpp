@@ -1,4 +1,3 @@
-#include <string.h>
 #include "parsing.h"
 
 // c A sample .cnf file.
@@ -6,7 +5,7 @@
 // 1 -3 0
 // 2 3 -1 0 
 
-void Parser::parseDimacsFile(const std::string &filePath) {
+void Parser::parseDimacsFile(const char *filePath) {
     return;
 }    
 
