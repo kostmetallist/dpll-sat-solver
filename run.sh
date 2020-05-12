@@ -1,2 +1,3 @@
-!#/bin/sh
+#!/bin/sh
 g++ main.cpp -o prog
+./prog
