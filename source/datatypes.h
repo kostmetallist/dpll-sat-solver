@@ -40,7 +40,25 @@ public:
         this->literals.push_back(literal);
     }
 
-    std::vector<Literal> getLiterals() {
+    std::vector<Literal> &getLiterals() {
         return this->literals;
+    }
+};
+
+
+class Formula {
+private:
+    std::vector<Clause> clauses;
+public:
+    Formula() {
+        this->clauses = std::vector<Clause>();
+    }
+
+    void addClause(const Clause &clause) {
+        this->clauses.push_back(clause);
+    }
+
+    std::vector<Clause> &getClauses() {
+        return this->clauses;
     }
 };

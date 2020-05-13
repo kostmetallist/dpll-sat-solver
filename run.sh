@@ -1,3 +1,4 @@
 #!/bin/sh
-g++ main.cpp -o prog
-./prog $1
+make
+./solver $1
+make clean
