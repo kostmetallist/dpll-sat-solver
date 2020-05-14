@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <set>
 #include <string.h>
 
 #include "parsing.h"
@@ -63,17 +64,20 @@ Pair<std::vector<char *>, bool> Parser::stringToTokens(const char *string) {
 
 Formula Parser::parseDimacsFile(const char *filePath) {
 
-    int literalsNum = 0, clausesNum = 0, clausesProcessed = 0;
+    int literalsClaimedNum = 0, clausesClaimedNum = 0, clausesProcessed = 0;
     char line[LINE_FETCH_SIZE];
     std::cout << "Opening " << filePath << std::endl;
 
     std::ifstream inputStream(filePath);
+    std::set<int> literalLabelSet;
     unsigned int lineCount = 0;
     bool readingAborted = false,
         problemLineDetected = false;
     Formula result;
 
-    while (!readingAborted && inputStream.getline(line, LINE_FETCH_SIZE)) {
+    while (!readingAborted && 
+           clausesProcessed <= clausesClaimedNum && 
+           inputStream.getline(line, LINE_FETCH_SIZE)) {
 
         // std::cout << "Processing \"" << line << "\"" << std::endl;
         auto tokenizeResult = stringToTokens(line);
@@ -99,8 +103,8 @@ Formula Parser::parseDimacsFile(const char *filePath) {
             } 
 
             try {
-                literalsNum = atoi(tokens[1]);
-                clausesNum  = atoi(tokens[2]);
+                literalsClaimedNum  = atoi(tokens[2]);
+                clausesClaimedNum   = atoi(tokens[3]);
                 problemLineDetected = true;
 
             } catch (std::out_of_range e) {
@@ -118,11 +122,23 @@ Formula Parser::parseDimacsFile(const char *filePath) {
                 if (!literalLabel) {
                     Clause clause(literals);
                     result.addClause(clause);
+                    ++clausesProcessed;
                     break;
                 }
 
-                Literal literal(std::abs(literalLabel), literalLabel > 0);
-                literals.push_back(literal);
+                int absLabel = std::abs(literalLabel);
+                literalLabelSet.insert(absLabel);
+                if (literalLabelSet.size() > literalsClaimedNum) {
+                    std::cerr << "Parsing error at line " << lineCount+1 << 
+                        ": distinct literals number exceeded claimed value; " << 
+                        "aborting" << std::endl;
+                    readingAborted = true;
+                    break;
+
+                } else {
+                    Literal literal(absLabel, literalLabel > 0);
+                    literals.push_back(literal);
+                }
             }
         }
 
