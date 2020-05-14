@@ -75,7 +75,7 @@ Formula Parser::parseDimacsFile(const char *filePath) {
 
     while (!readingAborted && inputStream.getline(line, LINE_FETCH_SIZE)) {
 
-        std::cout << "Processing \"" << line << "\"" << std::endl;
+        // std::cout << "Processing \"" << line << "\"" << std::endl;
         auto tokenizeResult = stringToTokens(line);
         std::vector<char *> tokens = tokenizeResult._1;
         
@@ -114,18 +114,16 @@ Formula Parser::parseDimacsFile(const char *filePath) {
             std::vector<Literal> literals;
             for (unsigned int i = 0; i < tokens.size(); ++i) {
                 int literalLabel = atoi(tokens[i]);
-                std::cout << literalLabel << " ";
 
                 if (!literalLabel) {
-                    std::cout << "Null has been reached";
                     Clause clause(literals);
                     result.addClause(clause);
+                    break;
                 }
 
                 Literal literal(std::abs(literalLabel), literalLabel > 0);
                 literals.push_back(literal);
             }
-            std::cout << std::endl;
         }
 
         ++lineCount;
@@ -138,6 +136,6 @@ Formula Parser::parseDimacsFile(const char *filePath) {
     inputStream.close();
     std::cout << "Input file is closed: " << lineCount << " lines processed" 
         << std::endl;
-    return Formula();
+    return result;
 }    
 

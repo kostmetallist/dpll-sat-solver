@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <vector>
 
 
@@ -42,6 +43,10 @@ public:
     const bool getSign() const {
         return this->sign;
     }
+
+    void printContents() const {
+        std::cout << (sign? "": "~") << id << std::endl;
+    }
 };
 
 
@@ -49,12 +54,9 @@ class Clause {
 private:
     std::vector<Literal> literals;
 public:
-    Clause() {
-        this->literals = std::vector<Literal>();
-    }
+    Clause() {}
 
     Clause(const std::vector<Literal> &literals) {
-        this->literals = std::vector<Literal>(literals.size());
         for (unsigned int i = 0; i < literals.size(); ++i) {
             this->addLiteral(Literal(literals[i]));
         }
@@ -70,6 +72,14 @@ public:
 
     std::vector<Literal> &getLiterals() {
         return this->literals;
+    }
+
+    void printContents() const {
+        for (unsigned int i = 0; i < literals.size(); ++i) {
+            std::cout << (literals[i].getSign() ? "": "~") << 
+                literals[i].getId() << " ";
+        }
+        std::cout << std::endl;
     }
 };
 
@@ -88,5 +98,11 @@ public:
 
     std::vector<Clause> &getClauses() {
         return this->clauses;
+    }
+
+    void printContents() const {
+        for (unsigned int i = 0; i < clauses.size(); ++i) {
+            clauses[i].printContents();
+        }
     }
 };

@@ -16,16 +16,7 @@ int main(int argc, char **argv) {
     }
 
     Formula formula = Parser().parseDimacsFile(inputFileName);
-    auto clauses = formula.getClauses();
-
-    for (unsigned int i = 0; i < clauses.size(); ++i) {
-        auto literals = clauses[i].getLiterals();
-        for (unsigned int j = 0; j < literals.size(); ++j) {
-            std::cout << (literals[i].getSign() ? "": "~") << 
-                literals[i].getId() << " ";
-        }
-        std::cout << std::endl;
-    }
+    formula.printContents();
 
     return 0;
 }
