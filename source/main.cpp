@@ -1,7 +1,8 @@
 #include <iostream>
 #include <vector>
-#include "datatypes.h"
+
 #include "parsing.h"
+#include "datatypes.h"
 
 
 int main(int argc, char **argv) {
