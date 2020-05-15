@@ -148,7 +148,6 @@ Formula Parser::parseDimacsFile(const char *filePath) {
         }
     }
 
-
     inputStream.close();
     std::cout << "Input file is closed: " << lineCount << " lines processed" 
         << std::endl;

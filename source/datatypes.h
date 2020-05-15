@@ -81,6 +81,20 @@ public:
         }
         std::cout << std::endl;
     }
+
+    bool hasContraryLiterals() const {
+        for (unsigned int i = 0; i < literals.size(); ++i) {
+            Literal pivotLiteral = literals[i];
+            for (unsigned int j = i+1; j < literals.size(); ++j) {
+                Literal current = literals[j];
+                if (current.getId() == pivotLiteral.getId() &&
+                    current.getSign() != pivotLiteral.getSign())
+
+                    return true;
+            }
+        }
+        return false;
+    }
 };
 
 
@@ -104,5 +118,15 @@ public:
         for (unsigned int i = 0; i < clauses.size(); ++i) {
             clauses[i].printContents();
         }
+    }
+
+    std::vector<int> getContraryClausesIndices() const {
+        std::vector<int> indices;
+        for (unsigned int i = 0; i < clauses.size(); ++i) {
+            if (clauses[i].hasContraryLiterals()) {
+                indices.push_back(i);
+            }
+        }
+        return indices;
     }
 };

@@ -1,0 +1,5 @@
+c Second and third clauses contain contrary literals so their indices (1, 2) should be denoted as contrary
+p cnf 4 3
+1 -2 3 0
+4 -1 1 2 0
+3 1 4 -3 0
