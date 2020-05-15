@@ -18,12 +18,9 @@ int main(int argc, char **argv) {
     Formula formula = Parser().parseDimacsFile(inputFileName);
     formula.printContents();
 
-    std::cout << "Contrary clauses indices found: " << std::endl;
-    std::vector<int> contraryClausesIndices = formula.getContraryClausesIndices();
-    for (unsigned int i = 0; i < contraryClausesIndices.size(); ++i) {
-        std::cout << contraryClausesIndices[i] << " ";
-    }
-    std::cout << std::endl;
+    std::cout << "Removing tautologies" << std::endl;
+    formula.removeTautologies();
+    formula.printContents();
 
     return 0;
 }

@@ -101,6 +101,54 @@ public:
 class Formula {
 private:
     std::vector<Clause> clauses;
+
+    void removeClausesByIndices(const std::vector<int> indices) {
+        for (unsigned int i = 0; i < indices.size(); ++i) {
+            clauses[indices[i]] = clauses.back();
+            clauses.pop_back();
+        }
+    }
+
+    std::vector<int> collectContraryClausesIndices() const {
+        std::vector<int> indices;
+        for (unsigned int i = 0; i < clauses.size(); ++i) {
+            if (clauses[i].hasContraryLiterals()) {
+                indices.push_back(i);
+            }
+        }
+        return indices;
+    }
+
+    Literal searchForUnitClauseLiteral() const {
+        for (unsigned int i = 0; i < clauses.size(); ++i) {
+            auto literals = clauses[i].getLiterals();
+            if (literals.size() == 1) 
+                return literals[0];
+        }
+
+        return Literal(-1, false);
+    }
+
+    std::vector<int> collectClausesContainingLiteralIndices(
+        const Literal sample) const {
+
+        std::vector<int> indices;
+        for (unsigned int i = 0; i < clauses.size(); ++i) {
+            auto literals = clauses[i].getLiterals();
+            for (unsigned int j = 0; j < literals.size(); ++j) {
+                if (literals[j].getId() == sample.getId() &&
+                    literals[j].getSign() == sample.getSign()) {
+
+                    indices.push_back(i);
+                    break;
+                }
+            }
+        }
+        return indices;
+    }
+
+
+
 public:
     Formula() {
         this->clauses = std::vector<Clause>();
@@ -120,13 +168,18 @@ public:
         }
     }
 
-    std::vector<int> getContraryClausesIndices() const {
-        std::vector<int> indices;
-        for (unsigned int i = 0; i < clauses.size(); ++i) {
-            if (clauses[i].hasContraryLiterals()) {
-                indices.push_back(i);
-            }
+    void removeTautologies() {
+        removeClausesByIndices(collectContraryClausesIndices());
+    }
+
+    void propagateUnit() {
+        auto unitLiteral = searchForUnitClauseLiteral();
+        while (unitLiteral.getId() != -1) {
+            auto clauseIndicesToDelete = 
+                collectClausesContainingLiteralIndices(unitLiteral);
+            removeClausesByIndices(clauseIndicesToDelete);
         }
-        return indices;
+
+        // TODO remove inverted unitLiteral from survived clauses
     }
 };
