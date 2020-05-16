@@ -1,8 +1,8 @@
 #include <iostream>
 #include <stack>
 
+#include "logic.h"
 #include "parsing.h"
-#include "datatypes.h"
 
 
 int main(int argc, char **argv) {

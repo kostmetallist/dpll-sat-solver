@@ -7,7 +7,6 @@
 #include <string.h>
 
 #include "parsing.h"
-#include "datatypes.h"
 
 #define LINE_FETCH_SIZE 256
 

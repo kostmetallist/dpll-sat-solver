@@ -6,7 +6,7 @@ BINARY_NAME = solver
 SOURCE_DIR = source
 BUILD_DIR = build
 HEADER_FILES := $(wildcard $(SOURCE_DIR)/*.h)
-OBJECT_FILES := $(BUILD_DIR)/main.o $(BUILD_DIR)/parsing.o
+OBJECT_FILES := $(BUILD_DIR)/main.o $(BUILD_DIR)/parsing.o $(BUILD_DIR)/logic.o
 
 $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp $(HEADER_FILES)
 	$(COMP) $(CFLAGS) -c -o $@ $<
