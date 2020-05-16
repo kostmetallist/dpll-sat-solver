@@ -22,5 +22,9 @@ int main(int argc, char **argv) {
     formula.removeTautologies();
     formula.printContents();
 
+    std::cout << "Unit propagation" << std::endl;
+    formula.propagateUnit();
+    formula.printContents();
+
     return 0;
 }

@@ -59,6 +59,19 @@ public:
 class Clause {
 private:
     std::vector<Literal> literals;
+
+    // TODO maybe move this along with printContents and with their Formula's counterparts to the Base class
+    void removeLiteralsByIndices(const std::vector<int> indices) {
+
+        std::vector<int> ordered(indices.size());
+        std::copy(indices.begin(), indices.end(), ordered.begin());
+        std::sort(ordered.begin(), ordered.end(), std::greater<int>());
+
+        for (unsigned int i = 0; i < ordered.size(); ++i) {
+            literals.erase(literals.begin() + ordered[i]);
+        }
+    }
+
 public:
     Clause() {}
 
@@ -99,7 +112,21 @@ public:
                     return true;
             }
         }
+
         return false;
+    }
+
+    void removeLiteralEntries(Literal literal) {
+
+        std::vector<int> matchedIndices;
+        for (unsigned int i = 0; i < literals.size(); ++i) {
+            if (literals[i].getId() == literal.getId() &&
+                literals[i].getSign() == literal.getSign()) {
+
+                matchedIndices.push_back(i);
+            }
+        }
+        removeLiteralsByIndices(matchedIndices);
     }
 };
 
@@ -115,9 +142,6 @@ private:
         std::sort(ordered.begin(), ordered.end(), std::greater<int>());
 
         for (unsigned int i = 0; i < ordered.size(); ++i) {
-            auto iter = clauses.begin() + ordered[i];
-            std::cout << "iteration " << i << "; removing " << ordered[i] << "th elem" << std::endl;
-            (*iter).printContents();
             clauses.erase(clauses.begin() + ordered[i]);
         }
     }
@@ -195,6 +219,11 @@ public:
             unitLiteral.setSign(not unitLiteral.getSign());
             auto clausesIndicesWithInverse = 
                 collectClausesContainingLiteralIndices(unitLiteral);
+            for (unsigned int i = 0; i < clausesIndicesWithInverse.size(); ++i) {
+                clauses[i].removeLiteralEntries(unitLiteral);
+            }
+
+            unitLiteral = searchForUnitClauseLiteral();
         }
     }
 };
