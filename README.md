@@ -8,3 +8,6 @@ This repository contains programmatic solution for the final assignment of Model
 
 ## Launching
 `./run.sh <DIMACS input file>`
+
+## Test data
+Samples of DIMACS files are located under `/data` and divided into simple ones, intended for separate DPLL stages verification, and real-world ones, gathered from the [repository](https://people.sc.fsu.edu/~jburkardt/data/cnf/cnf.html) of Scientific Computing Department of Florida State University.
