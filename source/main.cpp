@@ -11,40 +11,24 @@ int main(int argc, char **argv) {
     if (argc > 1) {
         inputFileName = argv[1];
     } else {
-        std::cerr << "No DIMACS input file is provided. Aborting." << std::endl;
+        std::cerr << "No DIMACS input file is provided; aborting" << std::endl;
         return 1;
     }
 
     bool verdict = false;
     Formula initialFormula = Parser().parseDimacsFile(inputFileName);
     initialFormula.removeTautologies();
-    Interpretation initialInterpretation;
 
+    Interpretation initialInterpretation;
     std::stack<Pair<Formula, Interpretation>> configurations;
     configurations.push(Pair<Formula, Interpretation>{
         ._1 = initialFormula,
         ._2 = initialInterpretation
     });
 
-    // std::cout << "Removing tautologies" << std::endl;
-    // formula.removeTautologies();
-    // formula.printContents();
-
-    // std::cout << "Unit propagation" << std::endl;
-    // formula.propagateUnit();
-    // formula.printContents();
-
-    // std::cout << "Pure literals exclusion" << std::endl;
-    // formula.excludePureLiterals();
-    // formula.printContents();
-
     while (not configurations.empty()) {
-        std::cout << "<configurations>" << std::endl;
         auto configuration = configurations.top();
-        std::cout << configurations.size() << std::endl;
         configurations.pop();
-        std::cout << configurations.size() << std::endl;
-        std::cout << "</configurations>" << std::endl;
 
         auto formula = configuration._1;
         formula.applyInterpretation(configuration._2);

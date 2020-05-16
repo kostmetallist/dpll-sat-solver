@@ -128,11 +128,33 @@ public:
         std::cout << std::endl;
     }
 
+    void eliminateDublications() {
+        std::set<Literal> withDublicates;
+        for (unsigned int i = 0; i < literals.size(); ++i) {
+            auto pivotLiteral = literals[i];
+            for (unsigned int j = i+1; j < literals.size(); ++j) {
+                auto current = literals[j];
+                if (current == pivotLiteral) {
+                    withDublicates.insert(pivotLiteral);
+                    break;
+                }
+            }
+        }
+        for (auto iter = withDublicates.begin(); 
+             iter != withDublicates.end(); 
+             ++iter) {
+
+            removeLiteralEntries(*iter);
+            // restoring first occurrence of the literal
+            literals.push_back(*iter);
+        }
+    }
+
     bool hasContraryLiterals() const {
         for (unsigned int i = 0; i < literals.size(); ++i) {
-            Literal pivotLiteral = literals[i];
+            auto pivotLiteral = literals[i];
             for (unsigned int j = i+1; j < literals.size(); ++j) {
-                Literal current = literals[j];
+                auto current = literals[j];
                 if (current.getId() == pivotLiteral.getId() &&
                     current.getSign() != pivotLiteral.getSign())
 
@@ -281,9 +303,11 @@ public:
         return false;
     }
 
-    // TODO remove clauses like (1 ~2 1 1)
     void removeTautologies() {
         removeClausesByIndices(collectContraryClausesIndices());
+        for (unsigned int i = 0; i < clauses.size(); ++i) {
+            clauses[i].eliminateDublications();
+        }
     }
 
     void propagateUnit() {

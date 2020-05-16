@@ -61,7 +61,6 @@ Pair<std::vector<char *>, bool> Parser::stringToTokens(const char *string) {
     };
 }
 
-
 Formula Parser::parseDimacsFile(const char *filePath) {
 
     int literalsClaimedNum = 0, clausesClaimedNum = 0, clausesProcessed = 0;
