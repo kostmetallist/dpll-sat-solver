@@ -1,6 +1,8 @@
 #pragma once
 
+#include <algorithm>
 #include <iostream>
+#include <iterator>
 #include <vector>
 
 
@@ -42,6 +44,10 @@ public:
 
     const bool getSign() const {
         return this->sign;
+    }
+
+    void setSign(bool sign) {
+        this->sign = sign;
     }
 
     void printContents() const {
@@ -103,9 +109,16 @@ private:
     std::vector<Clause> clauses;
 
     void removeClausesByIndices(const std::vector<int> indices) {
-        for (unsigned int i = 0; i < indices.size(); ++i) {
-            clauses[indices[i]] = clauses.back();
-            clauses.pop_back();
+
+        std::vector<int> ordered(indices.size());
+        std::copy(indices.begin(), indices.end(), ordered.begin());
+        std::sort(ordered.begin(), ordered.end(), std::greater<int>());
+
+        for (unsigned int i = 0; i < ordered.size(); ++i) {
+            auto iter = clauses.begin() + ordered[i];
+            std::cout << "iteration " << i << "; removing " << ordered[i] << "th elem" << std::endl;
+            (*iter).printContents();
+            clauses.erase(clauses.begin() + ordered[i]);
         }
     }
 
@@ -116,6 +129,7 @@ private:
                 indices.push_back(i);
             }
         }
+
         return indices;
     }
 
@@ -144,10 +158,9 @@ private:
                 }
             }
         }
+
         return indices;
     }
-
-
 
 public:
     Formula() {
@@ -178,8 +191,10 @@ public:
             auto clauseIndicesToDelete = 
                 collectClausesContainingLiteralIndices(unitLiteral);
             removeClausesByIndices(clauseIndicesToDelete);
-        }
 
-        // TODO remove inverted unitLiteral from survived clauses
+            unitLiteral.setSign(not unitLiteral.getSign());
+            auto clausesIndicesWithInverse = 
+                collectClausesContainingLiteralIndices(unitLiteral);
+        }
     }
 };
