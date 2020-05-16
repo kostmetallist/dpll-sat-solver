@@ -98,6 +98,14 @@ public:
         }
     }
 
+    Clause(const Clause &prototype) {
+        auto literalsSource = prototype.getLiterals();
+        this->literals = std::vector<Literal>(literalsSource.size());
+        for (unsigned int i = 0; i < literalsSource.size(); ++i) {
+            this->literals[i] = Literal(literalsSource[i]);
+        }
+    }
+
     void addLiteral(const Literal &literal) {
         this->literals.push_back(literal);
     }
@@ -211,12 +219,22 @@ private:
     }
 
 public:
-    Formula() {
-        this->clauses = std::vector<Clause>();
+    Formula() {}
+
+    Formula(const Formula &prototype) {
+        auto sourceClauses = prototype.getClauses();
+        this->clauses = std::vector<Clause>(sourceClauses.size());
+        for (unsigned int i = 0; i < sourceClauses.size(); ++i) {
+            this->clauses[i] = Clause(sourceClauses[i]);
+        }
     }
 
     void addClause(const Clause &clause) {
         this->clauses.push_back(clause);
+    }
+
+    const std::vector<Clause> &getClauses() const {
+        return this->clauses;
     }
 
     std::vector<Clause> &getClauses() {
@@ -262,17 +280,6 @@ public:
             if (literals.find(inversion) == literals.end()) {
                 auto clauseIndicesToDelete = 
                     collectSpecificClausesIndices(*iter);
-
-                std::cout << "current: ";
-                (*iter).printContents();
-                std::cout << "its inversion: ";
-                inversion.printContents();
-                std::cout << "___" << std::endl;
-                for (unsigned int i = 0; i < clauseIndicesToDelete.size(); ++i) {
-                    std::cout << clauseIndicesToDelete[i] << " ";
-                }
-                std::cout << "___" << std::endl;
-
                 removeClausesByIndices(clauseIndicesToDelete);
             }
         }
