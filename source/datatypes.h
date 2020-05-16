@@ -1,6 +1,8 @@
 #pragma once
 
 #include <algorithm>
+#include <cstdlib>
+#include <ctime>
 #include <iostream>
 #include <iterator>
 #include <set>
@@ -137,7 +139,6 @@ public:
                     return true;
             }
         }
-
         return false;
     }
 
@@ -155,30 +156,30 @@ public:
 
 class Interpretation {
 private:
-    std::vector<Pair<Literal, bool>> mapping;
+    std::vector<Pair<Literal, bool>> mappings;
 
 public:
     Interpretation() {}
 
-    Interpretation(const std::vector<Pair<Literal, bool>> mapping) {
-        for (unsigned int i = 0; i < mapping.size(); ++i) {
-            this->mapping.push_back(mapping[i]);
+    Interpretation(const std::vector<Pair<Literal, bool>> mappings) {
+        for (unsigned int i = 0; i < mappings.size(); ++i) {
+            this->mappings.push_back(mappings[i]);
         }
     }
 
     Interpretation(const Interpretation &prototype) {
-        auto sourceMapping = prototype.getMapping();
-        for (unsigned int i = 0; i < sourceMapping.size(); ++i) {
-            this->mapping.push_back(sourceMapping[i]);
+        auto sourceMappings = prototype.getMappings();
+        for (unsigned int i = 0; i < sourceMappings.size(); ++i) {
+            this->mappings.push_back(sourceMappings[i]);
         }
     }
 
-    const std::vector<Pair<Literal, bool>> &getMapping() const {
-        return this->mapping;
+    const std::vector<Pair<Literal, bool>> &getMappings() const {
+        return this->mappings;
     }
 
-    std::vector<Pair<Literal, bool>> &getMapping() {
-        return this->mapping;
+    std::vector<Pair<Literal, bool>> &getMappings() {
+        return this->mappings;
     }
 };
 
@@ -205,7 +206,6 @@ private:
                 indices.push_back(i);
             }
         }
-
         return indices;
     }
 
@@ -215,7 +215,6 @@ private:
             if (literals.size() == 1) 
                 return literals[0];
         }
-
         return Literal(-1, false);
     }
 
@@ -231,7 +230,6 @@ private:
                 }
             }
         }
-
         return indices;
     }
 
@@ -243,7 +241,6 @@ private:
                 result.insert(literals[j]);
             }
         }
-        
         return result;
     }
 
@@ -274,6 +271,14 @@ public:
         for (unsigned int i = 0; i < clauses.size(); ++i) {
             clauses[i].printContents();
         }
+    }
+
+    bool hasEmptyClause() const {
+        for (unsigned int i = 0; i < clauses.size(); ++i) {
+            if (clauses[i].getLiterals().empty())
+                return true;
+        }
+        return false;
     }
 
     // TODO remove clauses like (1 ~2 1 1)
@@ -316,10 +321,10 @@ public:
     }
 
     void applyInterpretation(Interpretation interpretation) {
-        auto mapping = interpretation.getMapping();
-        for (unsigned int i = 0; i < mapping.size(); ++i) {
-            Literal target = Literal(mapping[i]._1);
-            target.setSign(target.getSign() == mapping[i]._2);
+        auto mappings = interpretation.getMappings();
+        for (unsigned int i = 0; i < mappings.size(); ++i) {
+            Literal target = Literal(mappings[i]._1);
+            target.setSign(target.getSign() == mappings[i]._2);
 
             auto clauseIndicesToDelete = 
                 collectSpecificClausesIndices(target);
@@ -329,8 +334,23 @@ public:
             auto clauseIndicesToReduce = 
                 collectSpecificClausesIndices(inversion);
             for (unsigned int j = 0; j < clauseIndicesToReduce.size(); ++j) {
-                clauses[clauseIndicesToReduce[j]].removeLiteralEntries(inversion);
+                clauses[clauseIndicesToReduce[j]].
+                    removeLiteralEntries(inversion);
             }
         }
+    }
+
+    Pair<Literal, bool> pickRandomLiteralMapping() {
+
+        std::srand(std::time(NULL));
+        int clauseIndex = std::rand() % clauses.size();
+        auto literals = clauses[clauseIndex].getLiterals();
+        int literalIndex = std::rand() % literals.size();
+
+        auto result = Pair<Literal, bool>({
+            ._1 = literals[literalIndex],
+            ._2 = bool(std::rand() % 2)
+        });
+        return result;
     }
 };
