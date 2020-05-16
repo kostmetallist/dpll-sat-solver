@@ -29,6 +29,6 @@ int main(int argc, char **argv) {
     std::cout << "Pure literals exclusion" << std::endl;
     formula.excludePureLiterals();
     formula.printContents();
-    
+
     return 0;
 }

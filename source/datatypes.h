@@ -142,7 +142,6 @@ public:
     }
 
     void removeLiteralEntries(Literal literal) {
-
         std::vector<int> matchedIndices;
         for (unsigned int i = 0; i < literals.size(); ++i) {
             if (literals[i] == literal) {
@@ -150,6 +149,36 @@ public:
             }
         }
         removeLiteralsByIndices(matchedIndices);
+    }
+};
+
+
+class Interpretation {
+private:
+    std::vector<Pair<Literal, bool>> mapping;
+
+public:
+    Interpretation() {}
+
+    Interpretation(const std::vector<Pair<Literal, bool>> mapping) {
+        for (unsigned int i = 0; i < mapping.size(); ++i) {
+            this->mapping.push_back(mapping[i]);
+        }
+    }
+
+    Interpretation(const Interpretation &prototype) {
+        auto sourceMapping = prototype.getMapping();
+        for (unsigned int i = 0; i < sourceMapping.size(); ++i) {
+            this->mapping.push_back(sourceMapping[i]);
+        }
+    }
+
+    const std::vector<Pair<Literal, bool>> &getMapping() const {
+        return this->mapping;
+    }
+
+    std::vector<Pair<Literal, bool>> &getMapping() {
+        return this->mapping;
     }
 };
 
@@ -163,7 +192,6 @@ private:
         std::vector<int> ordered(indices.size());
         std::copy(indices.begin(), indices.end(), ordered.begin());
         std::sort(ordered.begin(), ordered.end(), std::greater<int>());
-
         for (unsigned int i = 0; i < ordered.size(); ++i) {
             clauses.erase(clauses.begin() + ordered[i]);
         }
@@ -215,6 +243,7 @@ private:
                 result.insert(literals[j]);
             }
         }
+        
         return result;
     }
 
@@ -247,6 +276,7 @@ public:
         }
     }
 
+    // TODO remove clauses like (1 ~2 1 1)
     void removeTautologies() {
         removeClausesByIndices(collectContraryClausesIndices());
     }
@@ -281,6 +311,25 @@ public:
                 auto clauseIndicesToDelete = 
                     collectSpecificClausesIndices(*iter);
                 removeClausesByIndices(clauseIndicesToDelete);
+            }
+        }
+    }
+
+    void applyInterpretation(Interpretation interpretation) {
+        auto mapping = interpretation.getMapping();
+        for (unsigned int i = 0; i < mapping.size(); ++i) {
+            Literal target = Literal(mapping[i]._1);
+            target.setSign(target.getSign() == mapping[i]._2);
+
+            auto clauseIndicesToDelete = 
+                collectSpecificClausesIndices(target);
+            removeClausesByIndices(clauseIndicesToDelete);
+
+            Literal inversion = target.getInversion();
+            auto clauseIndicesToReduce = 
+                collectSpecificClausesIndices(inversion);
+            for (unsigned int j = 0; j < clauseIndicesToReduce.size(); ++j) {
+                clauses[clauseIndicesToReduce[j]].removeLiteralEntries(inversion);
             }
         }
     }
