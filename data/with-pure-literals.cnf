@@ -1,0 +1,7 @@
+c Clauses with indices 0,1,3 contain `~1` and there is no `1` amidst the rest of clases => should be removed.
+c Clause with index 1 comprise literal `3` and it is the only appearance of `3` => should be removed but it is already due to previous step.
+p cnf 4 4
+2 -1 4 0
+-1 3 -2 0
+-4 2 0
+-1 2 -4 0

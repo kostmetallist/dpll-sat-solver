@@ -35,8 +35,13 @@ public:
         this->sign = prototype.getSign();
     }
 
-    bool operator==(const Literal &other) {
+    bool operator==(const Literal &other) const {
         return (this->id == other.id && this->sign == other.sign);
+    }
+
+    bool operator<(const Literal &other) const {
+        return ((this->sign? this->id: -this->id) < 
+                (other.sign? other.id: -other.id));
     }
 
     const int getId() const {
@@ -49,6 +54,12 @@ public:
 
     const bool getSign() const {
         return this->sign;
+    }
+
+    Literal getInversion() const {
+        Literal result(*this);
+        result.setSign(not result.getSign());
+        return result;
     }
 
     void setSign(bool sign) {
@@ -172,14 +183,12 @@ private:
         return Literal(-1, false);
     }
 
-    std::vector<int> collectClausesContainingLiteralIndices(
-        const Literal sample) const {
-
+    std::vector<int> collectSpecificClausesIndices(const Literal part) const {
         std::vector<int> indices;
         for (unsigned int i = 0; i < clauses.size(); ++i) {
             auto literals = clauses[i].getLiterals();
             for (unsigned int j = 0; j < literals.size(); ++j) {
-                if (literals[j] == sample) {
+                if (literals[j] == part) {
 
                     indices.push_back(i);
                     break;
@@ -188,6 +197,17 @@ private:
         }
 
         return indices;
+    }
+
+    std::set<Literal> gatherLiterals() const {
+        std::set<Literal> result;
+        for (unsigned int i = 0; i < clauses.size(); ++i) {
+            auto literals = clauses[i].getLiterals();
+            for (unsigned int j = 0; j < literals.size(); ++j) {
+                result.insert(literals[j]);
+            }
+        }
+        return result;
     }
 
 public:
@@ -217,13 +237,16 @@ public:
         auto unitLiteral = searchForUnitClauseLiteral();
         while (unitLiteral.getId() != -1) {
             auto clauseIndicesToDelete = 
-                collectClausesContainingLiteralIndices(unitLiteral);
+                collectSpecificClausesIndices(unitLiteral);
             removeClausesByIndices(clauseIndicesToDelete);
 
-            unitLiteral.setSign(not unitLiteral.getSign());
-            auto clausesIndicesWithInverse = 
-                collectClausesContainingLiteralIndices(unitLiteral);
-            for (unsigned int i = 0; i < clausesIndicesWithInverse.size(); ++i) {
+            auto clausesIndicesWithInverse = collectSpecificClausesIndices(
+                unitLiteral.getInversion());
+
+            for (unsigned int i = 0; 
+                 i < clausesIndicesWithInverse.size(); 
+                 ++i) {
+
                 clauses[i].removeLiteralEntries(unitLiteral);
             }
 
@@ -231,7 +254,27 @@ public:
         }
     }
 
-    // void excludePureLiterals() {
+    void excludePureLiterals() {
+        auto literals = gatherLiterals();
+        for (auto iter = literals.begin(); iter != literals.end(); ++iter) {
+            Literal inversion = (*iter).getInversion();
+            // if not found
+            if (literals.find(inversion) == literals.end()) {
+                auto clauseIndicesToDelete = 
+                    collectSpecificClausesIndices(*iter);
 
-    // }
+                std::cout << "current: ";
+                (*iter).printContents();
+                std::cout << "its inversion: ";
+                inversion.printContents();
+                std::cout << "___" << std::endl;
+                for (unsigned int i = 0; i < clauseIndicesToDelete.size(); ++i) {
+                    std::cout << clauseIndicesToDelete[i] << " ";
+                }
+                std::cout << "___" << std::endl;
+
+                removeClausesByIndices(clauseIndicesToDelete);
+            }
+        }
+    }
 };
