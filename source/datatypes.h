@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <set>
 #include <vector>
 
 
@@ -34,6 +35,10 @@ public:
         this->sign = prototype.getSign();
     }
 
+    bool operator==(const Literal &other) {
+        return (this->id == other.id && this->sign == other.sign);
+    }
+
     const int getId() const {
         return this->id;
     }
@@ -60,7 +65,8 @@ class Clause {
 private:
     std::vector<Literal> literals;
 
-    // TODO maybe move this along with printContents and with their Formula's counterparts to the Base class
+    // TODO maybe move this along with printContents and with their 
+    // Formula's counterparts to the Base class
     void removeLiteralsByIndices(const std::vector<int> indices) {
 
         std::vector<int> ordered(indices.size());
@@ -120,9 +126,7 @@ public:
 
         std::vector<int> matchedIndices;
         for (unsigned int i = 0; i < literals.size(); ++i) {
-            if (literals[i].getId() == literal.getId() &&
-                literals[i].getSign() == literal.getSign()) {
-
+            if (literals[i] == literal) {
                 matchedIndices.push_back(i);
             }
         }
@@ -150,6 +154,7 @@ private:
         std::vector<int> indices;
         for (unsigned int i = 0; i < clauses.size(); ++i) {
             if (clauses[i].hasContraryLiterals()) {
+
                 indices.push_back(i);
             }
         }
@@ -174,8 +179,7 @@ private:
         for (unsigned int i = 0; i < clauses.size(); ++i) {
             auto literals = clauses[i].getLiterals();
             for (unsigned int j = 0; j < literals.size(); ++j) {
-                if (literals[j].getId() == sample.getId() &&
-                    literals[j].getSign() == sample.getSign()) {
+                if (literals[j] == sample) {
 
                     indices.push_back(i);
                     break;
@@ -226,4 +230,8 @@ public:
             unitLiteral = searchForUnitClauseLiteral();
         }
     }
+
+    // void excludePureLiterals() {
+
+    // }
 };
