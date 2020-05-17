@@ -63,6 +63,7 @@ public:
     Interpretation(const Interpretation &prototype);
     const std::vector<Pair<Literal, bool>> &getMappings() const;
     std::vector<Pair<Literal, bool>> &getMappings();
+    void printContents() const;
 };
 
 

@@ -1,6 +1,7 @@
+#include <cstdlib>
+#include <ctime>
 #include <iostream>
 #include <stack>
-
 #include "logic.h"
 #include "parsing.h"
 
@@ -15,6 +16,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    std::srand(std::time(NULL));
     bool verdict = false;
     Formula initialFormula = Parser().parseDimacsFile(inputFileName);
     initialFormula.removeTautologies();
@@ -31,7 +33,13 @@ int main(int argc, char **argv) {
         configurations.pop();
 
         auto formula = configuration._1;
+        std::cout << "Applying interpretation:" << std::endl;
+        configuration._2.printContents();
         formula.applyInterpretation(configuration._2);
+
+        // std::cout << "Formula for call #" << callNumber << std::endl;
+        // formula.printContents();
+        // std::cout << "___" << std::endl;
 
         formula.propagateUnit();
         formula.excludePureLiterals();

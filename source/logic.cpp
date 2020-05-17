@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <cstdlib>
-#include <ctime>
 #include <iostream>
 #include <set>
 #include <vector>
@@ -178,6 +177,13 @@ std::vector<Pair<Literal, bool>> &Interpretation::getMappings() {
     return this->mappings;
 }
 
+void Interpretation::printContents() const {
+    for (unsigned int i = 0; i < mappings.size(); ++i) {
+        std::cout << (mappings[i]._1.getSign()? "": "~") << 
+            mappings[i]._1.getId() << " -> " << mappings[i]._2 << std::endl;
+    }
+}
+
 
 void Formula::removeClausesByIndices(const std::vector<int> indices) {
 
@@ -283,14 +289,24 @@ void Formula::removeTautologies() {
 void Formula::propagateUnit() {
     auto unitLiteral = searchForUnitClauseLiteral();
     while (unitLiteral.getId() != -1) {
+
         auto clauseIndicesToDelete = collectSpecificClausesIndices(unitLiteral);
+
+        // std::cout << "propagateUnit: toRemove" << std::endl;
+        // for (int i = 0; i < clauseIndicesToDelete.size(); ++i) {
+        //     std::cout << clauseIndicesToDelete[i] << " ";
+        // }
+        // std::cout << std::endl;
+
         removeClausesByIndices(clauseIndicesToDelete);
 
         auto clausesIndicesWithInverse = collectSpecificClausesIndices(
             unitLiteral.getInversion());
 
+
+
         for (unsigned int i = 0; i < clausesIndicesWithInverse.size(); ++i) {
-            clauses[i].removeLiteralEntries(unitLiteral);
+            clauses[i].removeLiteralEntries(unitLiteral.getInversion());
         }
 
         unitLiteral = searchForUnitClauseLiteral();
@@ -330,7 +346,6 @@ void Formula::applyInterpretation(Interpretation interpretation) {
 
 Pair<Literal, bool> Formula::pickRandomLiteralMapping() {
 
-    std::srand(std::time(NULL));
     int clauseIndex = std::rand() % clauses.size();
     auto literals = clauses[clauseIndex].getLiterals();
     int literalIndex = std::rand() % literals.size();
