@@ -291,22 +291,14 @@ void Formula::propagateUnit() {
     while (unitLiteral.getId() != -1) {
 
         auto clauseIndicesToDelete = collectSpecificClausesIndices(unitLiteral);
-
-        // std::cout << "propagateUnit: toRemove" << std::endl;
-        // for (int i = 0; i < clauseIndicesToDelete.size(); ++i) {
-        //     std::cout << clauseIndicesToDelete[i] << " ";
-        // }
-        // std::cout << std::endl;
-
         removeClausesByIndices(clauseIndicesToDelete);
 
-        auto clausesIndicesWithInverse = collectSpecificClausesIndices(
-            unitLiteral.getInversion());
-
-
-
+        auto inversion = unitLiteral.getInversion();
+        auto clausesIndicesWithInverse = 
+            collectSpecificClausesIndices(inversion);
         for (unsigned int i = 0; i < clausesIndicesWithInverse.size(); ++i) {
-            clauses[i].removeLiteralEntries(unitLiteral.getInversion());
+            clauses[clausesIndicesWithInverse[i]].removeLiteralEntries(
+                inversion);
         }
 
         unitLiteral = searchForUnitClauseLiteral();
