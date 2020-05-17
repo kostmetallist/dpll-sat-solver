@@ -6,6 +6,14 @@
 #include "parsing.h"
 
 
+typedef enum {
+    UNDEFINED = 0,
+    SAT,
+    UNSAT
+
+} VERDICT;
+
+
 int main(int argc, char **argv) {
 
     char *inputFileName;
@@ -17,7 +25,7 @@ int main(int argc, char **argv) {
     }
 
     std::srand(std::time(NULL));
-    bool verdict = false;
+    VERDICT verdict = UNDEFINED;
     Formula initialFormula = Parser().parseDimacsFile(inputFileName);
     initialFormula.removeTautologies();
 
@@ -45,11 +53,12 @@ int main(int argc, char **argv) {
         formula.excludePureLiterals();
 
         if (formula.hasEmptyClause()) {
+            verdict = UNSAT;
             break;
         }
 
         if (formula.getClauses().empty()) {
-            verdict = true;
+            verdict = SAT;
             break;
         }
 
@@ -74,6 +83,10 @@ int main(int argc, char **argv) {
         configurations.push(childConfig2);
     }
 
-    std::cout << "Verdict: " << (verdict? "SAT": "UNSAT") << std::endl;
+    std::cout << "Configurations left on stack: " << 
+        configurations.size() << std::endl;
+
+    std::cout << "Verdict: " << 
+        (verdict? (verdict == 1? "SAT": "UNSAT"): "UNDEFINED") << std::endl;
     return 0;
 }

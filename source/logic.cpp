@@ -314,15 +314,21 @@ void Formula::propagateUnit() {
 }
 
 void Formula::excludePureLiterals() {
+
     auto literals = gatherLiterals();
-    for (auto iter = literals.begin(); iter != literals.end(); ++iter) {
+    auto iter = literals.begin();
+    while (iter != literals.end()) {
         Literal inversion = (*iter).getInversion();
-        // if not found
+        // if not found => considered literal is pure
         if (literals.find(inversion) == literals.end()) {
             auto clauseIndicesToDelete = 
                 collectSpecificClausesIndices(*iter);
             removeClausesByIndices(clauseIndicesToDelete);
+            literals = gatherLiterals();
+            iter = literals.begin();
+            continue;
         }
+        ++iter;
     }
 }
 
