@@ -5,12 +5,12 @@
 #include "logic.h"
 #include "parsing.h"
 
+#define  TIMEOUT 30
+
 
 typedef enum {
-    UNDEFINED = 0,
-    SAT,
-    UNSAT
-
+    UNSAT = 0,
+    SAT
 } VERDICT;
 
 
@@ -24,8 +24,9 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    std::srand(std::time(NULL));
-    VERDICT verdict = UNDEFINED;
+    time_t startTime = std::time(NULL);
+    std::srand(startTime);
+    VERDICT verdict = UNSAT;
     Formula initialFormula = Parser().parseDimacsFile(inputFileName);
     initialFormula.removeTautologies();
 
@@ -41,24 +42,20 @@ int main(int argc, char **argv) {
         configurations.pop();
 
         auto formula = configuration._1;
-        std::cout << "Applying interpretation:" << std::endl;
-        configuration._2.printContents();
         formula.applyInterpretation(configuration._2);
-
-        // std::cout << "Formula for call #" << callNumber << std::endl;
-        // formula.printContents();
-        // std::cout << "___" << std::endl;
 
         formula.propagateUnit();
         formula.excludePureLiterals();
 
         if (formula.hasEmptyClause()) {
-            verdict = UNSAT;
+            continue;
+        } else if (formula.getClauses().empty()) {
+            verdict = SAT;
             break;
         }
 
-        if (formula.getClauses().empty()) {
-            verdict = SAT;
+        if ((std::time(NULL) - startTime) > TIMEOUT) {
+            std::cout << "Timed out" << std::endl;
             break;
         }
 
@@ -83,10 +80,6 @@ int main(int argc, char **argv) {
         configurations.push(childConfig2);
     }
 
-    std::cout << "Configurations left on stack: " << 
-        configurations.size() << std::endl;
-
-    std::cout << "Verdict: " << 
-        (verdict? (verdict == 1? "SAT": "UNSAT"): "UNDEFINED") << std::endl;
+    std::cout << "Verdict: " << (verdict? "SAT": "UNSAT") << std::endl;
     return 0;
 }

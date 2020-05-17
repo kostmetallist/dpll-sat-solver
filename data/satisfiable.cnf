@@ -1,0 +1,5 @@
+c A sample with SAT problem. Solution is (x=1, y=1).
+p cnf 2 3
+1 2 0
+1 -2 0
+-1 2 0
