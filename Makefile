@@ -1,4 +1,5 @@
 COMP = g++
+CFLAGS = -O3
 
 .PHONY: bin clean
 

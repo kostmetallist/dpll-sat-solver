@@ -98,11 +98,17 @@ std::vector<Literal> &Clause::getLiterals() {
 }
 
 void Clause::printContents() const {
-    for (unsigned int i = 0; i < literals.size(); ++i) {
-        std::cout << (literals[i].getSign() ? "": "~") << 
-            literals[i].getId() << " ";
+    if (literals.empty()) {
+        std::cout << "[]" << std::endl;
     }
-    std::cout << std::endl;
+
+    else {
+        for (unsigned int i = 0; i < literals.size(); ++i) {
+            std::cout << (literals[i].getSign() ? "": "~") << 
+                literals[i].getId() << " ";
+        }
+        std::cout << std::endl;
+    }
 }
 
 void Clause::eliminateDublications() {
@@ -306,7 +312,6 @@ void Formula::propagateUnit() {
 }
 
 void Formula::excludePureLiterals() {
-
     auto literals = gatherLiterals();
     auto iter = literals.begin();
     while (iter != literals.end()) {

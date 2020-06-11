@@ -5,8 +5,6 @@
 #include "logic.h"
 #include "parsing.h"
 
-#define  TIMEOUT 30
-
 
 typedef enum {
     UNSAT = 0,
@@ -51,11 +49,6 @@ int main(int argc, char **argv) {
             continue;
         } else if (formula.getClauses().empty()) {
             verdict = SAT;
-            break;
-        }
-
-        if ((std::time(NULL) - startTime) > TIMEOUT) {
-            std::cout << "Timed out" << std::endl;
             break;
         }
 
