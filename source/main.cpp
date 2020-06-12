@@ -3,9 +3,18 @@
 #include <iostream>
 #include <stack>
 #include <set>
+
+#include <stdio.h>
+
 #include <gmp.h>
+#include <omp.h>
+
 #include "logic.h"
 #include "parsing.h"
+
+// delay in seconds to display progress summary
+#define  DELTA_TICK 1
+#define  MAX_INT_DIGIT_NUMBER 10000
 
 
 typedef enum {
@@ -24,14 +33,30 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    time_t startTime = std::time(NULL);
-    std::srand(startTime);
+    std::cout.precision(2);
+    double startTime = omp_get_wtime();
+    double prevTick = startTime, currTick = startTime;
+
+    time_t seed = std::time(NULL);
+    std::srand(seed);
     VERDICT verdict = UNSAT;
     Formula initialFormula = Parser().parseDimacsFile(inputFileName);
     initialFormula.removeTautologies();
 
+    int generalizedLiteralsNum = initialFormula.getGeneralizedLiteralsNum();
     std::cout << "Generalized literals number: " << 
-        initialFormula.getGeneralizedLiteralsNum() << std::endl;
+        generalizedLiteralsNum << std::endl;
+
+    mpz_t totalBranchesToExamine, examinedBranches;
+    mpz_init2(totalBranchesToExamine, MAX_INT_DIGIT_NUMBER);
+    mpz_init2(examinedBranches, MAX_INT_DIGIT_NUMBER);
+
+    mpz_t base; mpz_init(base);
+    mpz_set_str(base, "2", 10);
+    mpz_pow_ui(totalBranchesToExamine, base, generalizedLiteralsNum);
+
+    mpf_t progressDenominator; mpf_init(progressDenominator);
+    mpf_set_z(progressDenominator, totalBranchesToExamine);
 
     Interpretation initialInterpretation;
     std::stack<Pair<Formula, Interpretation>> configurations;
@@ -51,6 +76,7 @@ int main(int argc, char **argv) {
         formula.excludePureLiterals();
 
         if (formula.hasEmptyClause()) {
+            mpz_add_ui(examinedBranches, examinedBranches, 1);
             continue;
         } else if (formula.getClauses().empty()) {
             verdict = SAT;
@@ -76,8 +102,24 @@ int main(int argc, char **argv) {
 
         configurations.push(childConfig1);
         configurations.push(childConfig2);
+
+        currTick = omp_get_wtime();
+        if (currTick - prevTick > (double) DELTA_TICK) {
+
+            mpf_t progressNumerator, progressRatio;
+            mpf_init(progressNumerator); mpf_init(progressRatio);
+
+            mpf_set_z(progressNumerator, examinedBranches);
+            mpf_div(progressRatio, progressNumerator, progressDenominator);
+            double ratioToDisplay = mpf_get_d(progressRatio);
+
+            std::cout << "Progress: " << ratioToDisplay*100 << "%" << std::endl;
+            prevTick = currTick;
+        }
     }
 
+    std::cout << "Completed in " << (omp_get_wtime()-startTime)*1000 << 
+        " ms" << std::endl;
     std::cout << "Verdict: " << (verdict? "SAT": "UNSAT") << std::endl;
     return 0;
 }

@@ -14,7 +14,7 @@ $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp $(HEADER_FILES)
 	$(COMP) $(CFLAGS) -c -o $@ $<
 
 bin: $(OBJECT_FILES)
-	$(COMP) $(CFLAGS) -o $(BINARY_NAME) $^ $(CLIBS)
+	$(COMP) $(CFLAGS) -fopenmp -o $(BINARY_NAME) $^ $(CLIBS)
 
 clean:
 	rm -f $(BUILD_DIR)/* $(BINARY_NAME)
