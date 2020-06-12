@@ -4,8 +4,6 @@
 #include <stack>
 #include <set>
 
-#include <stdio.h>
-
 #include <gmp.h>
 #include <omp.h>
 
