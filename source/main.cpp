@@ -2,6 +2,8 @@
 #include <ctime>
 #include <iostream>
 #include <stack>
+#include <set>
+#include <gmp.h>
 #include "logic.h"
 #include "parsing.h"
 
@@ -27,6 +29,9 @@ int main(int argc, char **argv) {
     VERDICT verdict = UNSAT;
     Formula initialFormula = Parser().parseDimacsFile(inputFileName);
     initialFormula.removeTautologies();
+
+    std::cout << "Generalized literals number: " << 
+        initialFormula.getGeneralizedLiteralsNum() << std::endl;
 
     Interpretation initialInterpretation;
     std::stack<Pair<Formula, Interpretation>> configurations;

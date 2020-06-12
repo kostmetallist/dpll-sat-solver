@@ -359,3 +359,15 @@ Pair<Literal, bool> Formula::pickRandomLiteralMapping() {
     });
     return result;
 }
+
+int Formula::getGeneralizedLiteralsNum() {
+    std::set<Literal> literals = gatherLiterals();
+    std::set<int> ids;
+    auto iter = literals.begin();
+
+    while (iter != literals.end()) {
+        ids.insert(iter->getId());
+        ++iter;
+    }
+    return ids.size();
+}

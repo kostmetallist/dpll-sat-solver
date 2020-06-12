@@ -90,4 +90,5 @@ public:
     void excludePureLiterals();
     void applyInterpretation(Interpretation interpretation);
     Pair<Literal, bool> pickRandomLiteralMapping();
+    int getGeneralizedLiteralsNum();
 };
