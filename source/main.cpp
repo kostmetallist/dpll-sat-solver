@@ -54,6 +54,7 @@ int main(int argc, char **argv) {
     mpz_t base; mpz_init(base);
     mpz_set_str(base, "2", 10);
     mpz_pow_ui(totalBranchesToExamine, base, generalizedLiteralsNum);
+    mpz_sub_ui(totalBranchesToExamine, totalBranchesToExamine, 1);
 
     mpf_t progressDenominator; mpf_init(progressDenominator);
     mpf_set_z(progressDenominator, totalBranchesToExamine);
@@ -76,8 +77,15 @@ int main(int argc, char **argv) {
         formula.excludePureLiterals();
 
         if (formula.hasEmptyClause()) {
-            mpz_add_ui(examinedBranches, examinedBranches, 1);
+
+            mpz_t branchesToExclude;
+            mpz_init2(branchesToExclude, MAX_INT_DIGIT_NUMBER);
+            mpz_pow_ui(branchesToExclude, base, 
+                formula.getGeneralizedLiteralsNum());
+            mpz_sub_ui(branchesToExclude, branchesToExclude, 1);
+            mpz_add(examinedBranches, examinedBranches, branchesToExclude);
             continue;
+
         } else if (formula.getClauses().empty()) {
             verdict = SAT;
             break;
